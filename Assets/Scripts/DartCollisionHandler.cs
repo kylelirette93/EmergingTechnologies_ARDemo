@@ -30,6 +30,6 @@ public class DartCollisionHandler : MonoBehaviour
         Transform parentTransform = transform.parent;
         rb.transform.SetParent(parentTransform);
 
-        transform.position += transform.forward * 0.05f;
+        transform.position += transform.forward * 0.04f;
     }
 }

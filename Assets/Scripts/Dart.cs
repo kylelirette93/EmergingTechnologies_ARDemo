@@ -21,8 +21,11 @@ public class Dart : MonoBehaviour
     {
         if (!isThrown)
         {
-            FollowMouse();
             if (Input.GetMouseButtonDown(0))
+            {
+                FollowMouse();
+            }
+            if (Input.GetMouseButtonUp(0))
             {
                 ThrowDart();
             }
