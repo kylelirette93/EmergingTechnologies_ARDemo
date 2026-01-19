@@ -4,7 +4,7 @@ using UnityEngine.XR;
 
 public class GameManager : MonoBehaviour
 {
-    [SerializeField] private GameState currentState = GameState.HowToPlace;
+    [SerializeField] private GameState currentState = GameState.Scanning;
     public static GameManager Instance;
     private UIManager uiManager;
     [SerializeField] private CatPlacer catPlacer;
@@ -25,6 +25,16 @@ public class GameManager : MonoBehaviour
         uiManager = GetComponentInChildren<UIManager>();
     }
 
+    private void OnEnable()
+    {
+        catPlacer.OnCatPlaced += TransitionToGameplay;
+    }
+
+    private void OnDisable()
+    {
+        catPlacer.OnCatPlaced -= TransitionToGameplay;
+    }
+
     public void HandleStateChange(GameState newState)
     {
         EnterState(newState);
@@ -33,11 +43,14 @@ public class GameManager : MonoBehaviour
     public void EnterState(GameState state)
     {
         currentState = state;
-        uiManager.DisableAllUI();
+        uiManager.DisplayScanningUI();
         switch (currentState)
         {
-            case GameState.HowToPlace:
-                uiManager.DisplayInfoUI();
+            case GameState.Scanning:
+                uiManager.DisplayScanningUI();
+                break;
+            case GameState.Placement:
+                uiManager.DisplayPlacementUI();
                 break;
             case GameState.Gameplay:
                 uiManager.DisplayGameplayUI();
@@ -47,14 +60,20 @@ public class GameManager : MonoBehaviour
 
     public void Confirm()
     {
-        uiManager.DisableAllUI();
+        uiManager.DisplayScanningUI();
         catPlacer.SetCanPlace(true);
+        HandleStateChange(GameState.Placement);
+    }
+
+    public void TransitionToGameplay()
+    {
         HandleStateChange(GameState.Gameplay);
     }
 }
 
 public enum GameState
 {
-    HowToPlace,
+    Scanning,
+    Placement,
     Gameplay
 }

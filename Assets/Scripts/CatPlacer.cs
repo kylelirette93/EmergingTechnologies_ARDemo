@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -17,6 +18,7 @@ public class CatPlacer : MonoBehaviour
     private bool canPlace = false;
 
     private static readonly List<ARRaycastHit> rayHits = new();
+    public event Action OnCatPlaced;
     private void Update()
     {
         if (!raycastManager || !canPlace || isPlaced)
@@ -57,6 +59,7 @@ public class CatPlacer : MonoBehaviour
             // Spawn a cat if it doesn't exist.
             spawnedCat = Instantiate(catPrefab, hitPose.position, hitPose.rotation);
             isPlaced = true;
+            OnCatPlaced?.Invoke();
         }
         else
         {

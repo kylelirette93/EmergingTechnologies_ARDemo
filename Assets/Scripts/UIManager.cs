@@ -3,20 +3,30 @@ using UnityEngine;
 
 public class UIManager : MonoBehaviour
 {
-    public GameObject infoPanel;
+    public GameObject scanningPanel;
+    public GameObject placementPanel;
     public GameObject gameplayPanel;
 
     public void DisableAllUI()
     {
-        infoPanel.SetActive(false);
+        scanningPanel.SetActive(false);
+        placementPanel.SetActive(false);
+        gameplayPanel.SetActive(false);
     }
-    public void DisplayInfoUI()
+    public void DisplayScanningUI()
     {
-        infoPanel.SetActive(true);
+        DisableAllUI();
+        scanningPanel.SetActive(true);
+    }
+    public void DisplayPlacementUI()
+    {
+        DisableAllUI();
+        placementPanel.SetActive(true);
     }
 
     public void DisplayGameplayUI()
     {
+        DisableAllUI();
         gameplayPanel.SetActive(true);
     }
 }
