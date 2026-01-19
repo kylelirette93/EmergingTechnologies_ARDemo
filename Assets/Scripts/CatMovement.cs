@@ -2,29 +2,29 @@ using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.InputSystem.Controls;
 
-public class AnimationController : MonoBehaviour
+public class CatMovement : MonoBehaviour
 {
-    Animator animator;
-    private Camera arCamera;
-    [SerializeField] LayerMask catLayer;
-    [SerializeField] LayerMask groundLayer;
-    private AudioSource audioSource;
+    [Header("References")]
+    [SerializeField] private GameObject interactionParticlesPrefab;
+    private AnimationController animationController;
     Vector3 targetPosition;
+    private Camera arCamera;
+    private AudioSource audioSource;
+
+    [Header("Layer Masks")]
+    [SerializeField] private LayerMask catLayer;
+    [SerializeField] private LayerMask groundLayer;
+
+    [Header("Movement Settings")]
     private float moveSpeed = 1.5f;
     private float rotSpeed = 5f;
-    [SerializeField] private GameObject interactionParticlesPrefab;
 
     private void Start()
     {
-        animator = GetComponent<Animator>();
         arCamera = Camera.main;
         audioSource = GetComponent<AudioSource>();
         targetPosition = transform.position;
-    }
-
-    public void PetCat()
-    {
-        animator.SetTrigger("Pet");
+        animationController = GetComponent<AnimationController>();
     }
 
     public void Update()
@@ -51,7 +51,7 @@ public class AnimationController : MonoBehaviour
         {
             if (hit.transform == transform)
             {
-                animator.SetTrigger("Pet");
+                animationController.PetCat();
                 audioSource.Play();
             }
         }
@@ -59,7 +59,7 @@ public class AnimationController : MonoBehaviour
         else if (Physics.Raycast(ray, out RaycastHit groundHit, 50f, groundLayer))
         {
             targetPosition = groundHit.point;
-            animator.SetBool("isWalking", true);
+            animationController.SetWalking(true);
             SpawnParticles(groundHit.point);
         }
     }
@@ -77,7 +77,7 @@ public class AnimationController : MonoBehaviour
 
         if (Vector3.Distance(transform.position, targetPosition) < 0.1f)
         {
-            animator.SetBool("isWalking", false);
+            animationController.SetWalking(false);
         }
     }
 

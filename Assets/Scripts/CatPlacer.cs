@@ -9,11 +9,12 @@ using UnityEngine.XR.ARSubsystems;
 public class CatPlacer : MonoBehaviour
 {
     [SerializeField] private ARRaycastManager raycastManager;
-    bool isPlacing = false;
-    bool isPlaced = false;
-    bool canPlace = false;
     [SerializeField] private GameObject catPrefab;
     private GameObject spawnedCat;
+
+    private bool isPlacing = false;
+    private bool isPlaced = false;
+    private bool canPlace = false;
 
     private static readonly List<ARRaycastHit> rayHits = new();
     private void Update()
@@ -21,6 +22,7 @@ public class CatPlacer : MonoBehaviour
         if (!raycastManager || !canPlace || isPlaced)
             return;
 
+        #region Get Input
         if (Touchscreen.current == null)
             return;
 
@@ -32,6 +34,7 @@ public class CatPlacer : MonoBehaviour
         isPlacing = true;
 
         Vector2 touchPosition = primaryTouch.position.ReadValue();
+        #endregion
 
         TryPlaceCat(touchPosition);
 
@@ -40,20 +43,24 @@ public class CatPlacer : MonoBehaviour
 
     private void TryPlaceCat(Vector2 touchPosition)
     {
+        // If nothing is detected return.
         if (!raycastManager.Raycast(
                 touchPosition,
                 rayHits,
                 TrackableType.PlaneWithinPolygon | TrackableType.FeaturePoint))
             return;
 
+        // Get the pose of the hit to move cat.
         Pose hitPose = rayHits[0].pose;
         if (spawnedCat == null)
         {
+            // Spawn a cat if it doesn't exist.
             spawnedCat = Instantiate(catPrefab, hitPose.position, hitPose.rotation);
             isPlaced = true;
         }
         else
         {
+            // If cat is placed, update position.
             spawnedCat.transform.position = hitPose.position;
             spawnedCat.transform.rotation = hitPose.rotation;
         }
@@ -66,6 +73,7 @@ public class CatPlacer : MonoBehaviour
 
     private IEnumerator ResetPlacing()
     {
+        // Reset with delay to avoid more than one placement per touch.
         yield return new WaitForSeconds(0.25f);
         isPlacing = false;
     }

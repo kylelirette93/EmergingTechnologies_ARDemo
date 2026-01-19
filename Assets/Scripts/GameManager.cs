@@ -37,7 +37,10 @@ public class GameManager : MonoBehaviour
         switch (currentState)
         {
             case GameState.HowToPlace:
-                uiManager.DisplayInfo();
+                uiManager.DisplayInfoUI();
+                break;
+            case GameState.Gameplay:
+                uiManager.DisplayGameplayUI();
                 break;
         }
     } 
@@ -46,6 +49,7 @@ public class GameManager : MonoBehaviour
     {
         uiManager.DisableAllUI();
         catPlacer.SetCanPlace(true);
+        HandleStateChange(GameState.Gameplay);
     }
 }
 
