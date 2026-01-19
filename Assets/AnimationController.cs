@@ -10,10 +10,9 @@ public class AnimationController : MonoBehaviour
     [SerializeField] LayerMask groundLayer;
     private AudioSource audioSource;
     Vector3 targetPosition;
-    private bool isMoving = false;
     private float moveSpeed = 1.5f;
     private float rotSpeed = 5f;
-    private FaceCamera faceCamera;
+    [SerializeField] private GameObject interactionParticlesPrefab;
 
     private void Start()
     {
@@ -21,7 +20,6 @@ public class AnimationController : MonoBehaviour
         arCamera = Camera.main;
         audioSource = GetComponent<AudioSource>();
         targetPosition = transform.position;
-        faceCamera = GetComponent<FaceCamera>();
     }
 
     public void PetCat()
@@ -58,23 +56,16 @@ public class AnimationController : MonoBehaviour
             }
         }
 
-        if (Physics.Raycast(ray, out RaycastHit groundHit, 50f, groundLayer))
+        else if (Physics.Raycast(ray, out RaycastHit groundHit, 50f, groundLayer))
         {
             targetPosition = groundHit.point;
-            isMoving = true;
             animator.SetBool("isWalking", true);
+            SpawnParticles(groundHit.point);
         }
     }
 
     private void HandleMovement()
     {
-        if (!isMoving)
-        {
-            faceCamera.enabled = true;
-            return;
-        }
-
-        faceCamera.enabled = false;
         transform.position = Vector3.MoveTowards(transform.position, targetPosition, moveSpeed * Time.deltaTime);
 
         Vector3 direction = (targetPosition - transform.position).normalized;
@@ -86,8 +77,12 @@ public class AnimationController : MonoBehaviour
 
         if (Vector3.Distance(transform.position, targetPosition) < 0.1f)
         {
-            isMoving = false;
             animator.SetBool("isWalking", false);
         }
+    }
+
+    private void SpawnParticles(Vector3 hitPoint)
+    {
+        Instantiate(interactionParticlesPrefab, hitPoint, Quaternion.identity);
     }
 }

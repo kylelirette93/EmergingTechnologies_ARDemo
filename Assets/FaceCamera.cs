@@ -13,10 +13,7 @@ public class FaceCamera : MonoBehaviour
     {
         if (!arCamera) return;
 
-        transform.LookAt(transform.position + arCamera.transform.rotation * Vector3.forward,
-            arCamera.transform.rotation * Vector3.up
-            );
-
-        transform.Rotate(0, 180f, 0, Space.Self);
+        Vector3 targetPosition = new Vector3(arCamera.transform.position.x, transform.position.y, arCamera.transform.position.z);
+        transform.LookAt(targetPosition);
     }
 }
