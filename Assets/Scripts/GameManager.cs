@@ -7,7 +7,11 @@ public class GameManager : MonoBehaviour
     [SerializeField] private GameState currentState = GameState.Scanning;
     public static GameManager Instance;
     private UIManager uiManager;
-    [SerializeField] private CatPlacer catPlacer;
+    [SerializeField] private ObjectPlacer catPlacer;
+    float timeCounter = 0f;
+    float lastTimeChecked;
+    [SerializeField] TextMeshProUGUI timerText;
+    [SerializeField] SpawnManager spawnManager;
 
     private void Awake()
     {
@@ -47,16 +51,33 @@ public class GameManager : MonoBehaviour
         switch (currentState)
         {
             case GameState.Scanning:
+                catPlacer.ResetPlacement();
                 uiManager.DisplayScanningUI();
                 break;
             case GameState.Placement:
                 uiManager.DisplayPlacementUI();
                 break;
             case GameState.Gameplay:
+                Time.timeScale = 1f;
+                spawnManager.SetSpawning(true);
+                timeCounter = 0f;
                 uiManager.DisplayGameplayUI();
                 break;
+            case GameState.Gameover:
+                spawnManager.SetSpawning(false);
+                uiManager.DisplayGameoverUI();
+                Time.timeScale = 0f;
+                break;
         }
-    } 
+    }
+
+    private void Update()
+    {
+        timeCounter += Time.deltaTime;
+        int minutes = Mathf.FloorToInt(timeCounter / 60);
+        int seconds = Mathf.FloorToInt(timeCounter % 60);
+        timerText.text = string.Format("{0:00}:{1:00}", minutes, seconds);
+    }
 
     public void Confirm()
     {
@@ -69,11 +90,17 @@ public class GameManager : MonoBehaviour
     {
         HandleStateChange(GameState.Gameplay);
     }
+
+    public void Restart()
+    {
+        HandleStateChange(GameState.Gameplay);
+    }
 }
 
 public enum GameState
 {
     Scanning,
     Placement,
-    Gameplay
+    Gameplay,
+    Gameover
 }

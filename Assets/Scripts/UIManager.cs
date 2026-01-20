@@ -6,12 +6,14 @@ public class UIManager : MonoBehaviour
     public GameObject scanningPanel;
     public GameObject placementPanel;
     public GameObject gameplayPanel;
+    public GameObject gameoverPanel;
 
     public void DisableAllUI()
     {
         scanningPanel.SetActive(false);
         placementPanel.SetActive(false);
         gameplayPanel.SetActive(false);
+        gameoverPanel.SetActive(false);
     }
     public void DisplayScanningUI()
     {
@@ -28,5 +30,11 @@ public class UIManager : MonoBehaviour
     {
         DisableAllUI();
         gameplayPanel.SetActive(true);
+    }
+
+    public void DisplayGameoverUI()
+    {
+        DisableAllUI();
+        gameoverPanel.SetActive(true);
     }
 }

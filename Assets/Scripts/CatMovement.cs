@@ -1,6 +1,7 @@
 using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.InputSystem.Controls;
+using UnityEngine.Rendering;
 
 public class CatMovement : MonoBehaviour
 {
@@ -18,6 +19,14 @@ public class CatMovement : MonoBehaviour
     [Header("Movement Settings")]
     private float moveSpeed = 1.5f;
     private float rotSpeed = 5f;
+    bool isMoving = false;
+
+    [Header("Jump Settings")]
+    private bool isGrounded = false;
+    private bool isJumping = false;
+    float jumpForce = 7f;
+    Rigidbody rb;
+    Quaternion originalRotation;
 
     private void Start()
     {
@@ -25,12 +34,14 @@ public class CatMovement : MonoBehaviour
         audioSource = GetComponent<AudioSource>();
         targetPosition = transform.position;
         animationController = GetComponent<AnimationController>();
+        rb = GetComponent<Rigidbody>();
+        originalRotation = transform.rotation;
     }
 
     public void Update()
     {
         HandleTouchInput();
-        HandleMovement();
+        HandleMovement();     
     }
 
     private void HandleTouchInput()
@@ -51,7 +62,11 @@ public class CatMovement : MonoBehaviour
         {
             if (hit.transform == transform)
             {
-                animationController.PetCat();
+                if (isGrounded)
+                {
+                    Jump();
+                }
+                // Gonna play a jump anim here.
                 audioSource.Play();
             }
         }
@@ -68,17 +83,40 @@ public class CatMovement : MonoBehaviour
     {
         transform.position = Vector3.MoveTowards(transform.position, targetPosition, moveSpeed * Time.deltaTime);
 
-        Vector3 direction = (targetPosition - transform.position).normalized;
-        if (direction != Vector3.zero)
-        {
-            Quaternion lookRotation = Quaternion.LookRotation(direction);
-            transform.rotation = Quaternion.Slerp(transform.rotation, lookRotation, Time.deltaTime * rotSpeed);
-        }
+        RotateInMoveDirection();
 
         if (Vector3.Distance(transform.position, targetPosition) < 0.1f)
         {
             animationController.SetWalking(false);
         }
+    }
+
+    private void OnCollisionEnter(Collision collision)
+    {
+        if (((1 << collision.gameObject.layer) & groundLayer) != 0)
+        {
+            isJumping = false;
+            isGrounded = true;
+            transform.rotation = originalRotation;
+        }
+    }
+
+    private void RotateInMoveDirection()
+    {
+        Vector3 direction = (targetPosition - transform.position).normalized;
+        if (direction != Vector3.zero && !isJumping)
+        {
+            Quaternion lookRotation = Quaternion.LookRotation(direction);
+            transform.rotation = Quaternion.Slerp(transform.rotation, lookRotation, Time.deltaTime * rotSpeed);
+        }
+    }
+
+    private void Jump()
+    {
+        isJumping = true;
+        rb.AddForce(Vector3.up * jumpForce, ForceMode.Impulse);
+        transform.rotation = originalRotation;
+        isGrounded = false;
     }
 
     private void SpawnParticles(Vector3 hitPoint)

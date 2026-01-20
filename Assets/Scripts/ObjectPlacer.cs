@@ -7,7 +7,7 @@ using UnityEngine.InputSystem.Controls;
 using UnityEngine.XR.ARFoundation;
 using UnityEngine.XR.ARSubsystems;
 
-public class CatPlacer : MonoBehaviour
+public class ObjectPlacer : MonoBehaviour
 {
     [SerializeField] private ARRaycastManager raycastManager;
     [SerializeField] private GameObject catPrefab;
@@ -72,6 +72,13 @@ public class CatPlacer : MonoBehaviour
     public void SetCanPlace(bool value)
     {
         canPlace = value;
+    }
+
+    public void ResetPlacement()
+    {
+        spawnedCat = null;
+        isPlaced = false;
+        canPlace = true;
     }
 
     private IEnumerator ResetPlacing()
